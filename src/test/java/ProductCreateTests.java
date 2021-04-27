@@ -11,6 +11,7 @@ import enums.CategoryType;
 import dto.ErrorBody;
 
 import service.ProductService;
+import util.DbUtils;
 import util.RetrofitUtils;
 
 import java.io.IOException;
@@ -61,6 +62,7 @@ public class ProductCreateTests {
                         .execute();
         productId = response.body().getId();
         assertThat(response.isSuccessful()).isTrue();
+
     }
 
     @SneakyThrows
