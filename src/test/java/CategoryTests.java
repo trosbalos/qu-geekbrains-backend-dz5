@@ -1,8 +1,11 @@
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import retrofit2.Response;
 import dto.Category;
+import ru.geekbrains.java4.lesson6.db.dao.CategoriesMapper;
 import service.CategoryService;
+import util.DbUtils;
 import util.RetrofitUtils;
 
 import java.io.IOException;
@@ -20,6 +23,11 @@ public class CategoryTests {
         categoryService = RetrofitUtils.getRetrofit().create(CategoryService.class);
     }
 
+    @BeforeEach
+    void setUp() {
+
+        CategoriesMapper categoriesMapper = DbUtils.getCategoriesMapper();
+    }
     @Test
     void getFoodCategoryPositiveTest() throws IOException {
         Response<Category> response = categoryService

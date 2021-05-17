@@ -10,6 +10,9 @@ import retrofit2.Converter;
 import enums.CategoryType;
 import dto.ErrorBody;
 
+import ru.geekbrains.java4.lesson6.db.dao.CategoriesMapper;
+import ru.geekbrains.java4.lesson6.db.dao.ProductsMapper;
+import ru.geekbrains.java4.lesson6.db.model.Products;
 import service.ProductService;
 import util.DbUtils;
 import util.RetrofitUtils;
@@ -39,6 +42,8 @@ public class ProductCreateTests {
                 .withCategoryTitle(CategoryType.FOOD.getTitle())
                 .withPrice((int) (Math.random() * 1000 + 1))
                 .withTitle(faker.food().ingredient());
+
+        ProductsMapper productsMapper = DbUtils.getProductsMapper();
     }
 
     @SneakyThrows
@@ -55,26 +60,36 @@ public class ProductCreateTests {
     @SneakyThrows
     @Test
     void createNewProductPriceMaxINT() {
-        product.setPrice(2147483647);
+        int maxINT = 2147483647;
+        product.setPrice(maxINT);
 
         retrofit2.Response<Product> response =
                 productService.createProduct(product)
                         .execute();
         productId = response.body().getId();
         assertThat(response.isSuccessful()).isTrue();
+        ProductsMapper productsMapper = DbUtils.getProductsMapper();
+        Products productDb = productsMapper.selectByPrimaryKey(Long.valueOf(productId));
+        assertThat(productDb.getPrice().equals(maxINT));
+
 
     }
 
     @SneakyThrows
     @Test
     void createNewProductPriceZero() {
-        product.setPrice(0);
+        int zeroPrice = 0;
+        product.setPrice(zeroPrice);
 
         retrofit2.Response<Product> response =
                 productService.createProduct(product)
                         .execute();
         productId = response.body().getId();
         assertThat(response.isSuccessful()).isFalse();
+        ProductsMapper productsMapper = DbUtils.getProductsMapper();
+        Products productDb = productsMapper.selectByPrimaryKey(Long.valueOf(productId));
+        assertThat(productDb.getPrice().equals(zeroPrice));
+
     }
 
     @SneakyThrows
@@ -87,11 +102,12 @@ public class ProductCreateTests {
                         .execute();
         productId = response.body().getId();
         assertThat(response.isSuccessful()).isFalse();
+
     }
 
     @SneakyThrows
     @Test
-    void createNewProductPriceNo() {
+    void createNewProductNoPrice() {
         product = new Product()
                 .withCategoryTitle(CategoryType.FOOD.getTitle())
                 .withTitle(faker.food().ingredient());
@@ -101,12 +117,14 @@ public class ProductCreateTests {
                         .execute();
         productId = response.body().getId();
         assertThat(response.isSuccessful()).isFalse();
+
     }
 
     @SneakyThrows
     @Test
     void createNewProductPriceDouble() {
-        product.setPrice(888.63453);
+        double PriceWithDot = 888.63453;
+        product.setPrice(PriceWithDot);
 
         retrofit2.Response<Product> response =
                 productService.createProduct(product)
@@ -114,7 +132,10 @@ public class ProductCreateTests {
         productId = response.body().getId();
         productPrice = response.body().getPrice();
         assertThat(response.isSuccessful()).isTrue();
-        assertThat(productPrice.equals(888.63453));
+        assertThat(productPrice.equals(PriceWithDot));
+        ProductsMapper productsMapper = DbUtils.getProductsMapper();
+        Products productDb = productsMapper.selectByPrimaryKey(Long.valueOf(productId));
+        assertThat(productDb.getPrice().equals(PriceWithDot));
 
     }
 
@@ -129,6 +150,8 @@ public class ProductCreateTests {
                         .execute();
         productId = response.body().getId();
         assertThat(response.isSuccessful()).isFalse();
+
+
     }
 
     @SneakyThrows
@@ -140,6 +163,7 @@ public class ProductCreateTests {
                 productService.createProduct(product)
                         .execute();
         assertThat(response.isSuccessful()).isFalse();
+
     }
 
     @SneakyThrows
@@ -156,7 +180,8 @@ public class ProductCreateTests {
     @SneakyThrows
     @Test
     void createNewProductTitleString() {
-        product.setTitle("HelB");
+        String title = "HelB";
+        product.setTitle(title);
 
 
         retrofit2.Response<Product> response =
@@ -164,42 +189,61 @@ public class ProductCreateTests {
                         .execute();
         productId = response.body().getId();
         assertThat(response.isSuccessful()).isTrue();
+        ProductsMapper productsMapper = DbUtils.getProductsMapper();
+        Products productDb = productsMapper.selectByPrimaryKey(Long.valueOf(productId));
+        assertThat(productDb.getTitle().equals(title));
     }
 
     @SneakyThrows
     @Test
     void createNewProductTitleLongString() {
-        product.setTitle(faker.chuckNorris().fact());
+        String title = faker.chuckNorris().fact();
+        product.setTitle(title);
 
         retrofit2.Response<Product> response =
                 productService.createProduct(product)
                         .execute();
         productId = response.body().getId();
         assertThat(response.isSuccessful()).isTrue();
+        ProductsMapper productsMapper = DbUtils.getProductsMapper();
+        Products productDb = productsMapper.selectByPrimaryKey(Long.valueOf(productId));
+        assertThat(product.getTitle().equals(productDb.getTitle()));
+
     }
 
     @SneakyThrows
     @Test
     void createNewProductTitleSymbols() {
-        product.setTitle("!@#!@#");
+        String title = "!@#!@#";
+        product.setTitle(title);
 
         retrofit2.Response<Product> response =
                 productService.createProduct(product)
                         .execute();
         productId = response.body().getId();
         assertThat(response.isSuccessful()).isTrue();
+        ProductsMapper productsMapper = DbUtils.getProductsMapper();
+        Products productDb = productsMapper.selectByPrimaryKey(Long.valueOf(productId));
+        assertThat(product.getPrice().equals(productDb.getTitle()));
+
     }
 
     @SneakyThrows
     @Test
     void createNewProductTitleNumbers() {
-        product.setTitle(faker.phoneNumber().cellPhone());
+        String title = faker.phoneNumber().cellPhone();
+        product.setTitle(title);
 
         retrofit2.Response<Product> response =
                 productService.createProduct(product)
                         .execute();
         productId = response.body().getId();
         assertThat(response.isSuccessful()).isTrue();
+        ProductsMapper productsMapper = DbUtils.getProductsMapper();
+        Products productDb = productsMapper.selectByPrimaryKey(Long.valueOf(productId));
+        assertThat(product.getPrice().equals(productDb.getTitle()));
+
+
     }
 
 
@@ -238,6 +282,7 @@ public class ProductCreateTests {
                         .execute();
 
         assertThat(response.isSuccessful()).isTrue();
+
     }
 
  @SneakyThrows
@@ -277,6 +322,7 @@ public class ProductCreateTests {
     void tearDown() {
         if (productId != null)
             try {
+
                 retrofit2.Response<ResponseBody> response =
                         productService.deleteProduct(productId)
                                 .execute();
